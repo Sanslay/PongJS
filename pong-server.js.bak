@@ -52,6 +52,7 @@ io.sockets.on('connection', function (socket) {
     console.log('Connection d un nouveau joueur: '+ address.address + " : " + address.port);
     var players;
 	
+	
 
     if(games[games.length - 1].length >= 2) 
 	{
@@ -64,6 +65,7 @@ io.sockets.on('connection', function (socket) {
     }
 	//On defini un joueur par son numero sa positio et son socket
     var player = {'number': players.length,'position': 0,'socket': socket}
+
 	//Si il y a moins de 2 joueurs , il y a que 1 joueur possible en jeu 
 	if(nbj<2)
 	{
@@ -114,8 +116,8 @@ io.sockets.on('connection', function (socket) {
 			Vitesse=1+(vitesseJ1+vitesseJ2)/3;
 			var Vitessepourcent = Vitesse*100
 			
-			players[0].socket.emit('vitesse-change', parseInt(Vitessepourcent););
-			players[1].socket.emit('vitesse-change', parseInt(Vitessepourcent););
+			players[0].socket.emit('vitesse-change', parseInt(Vitessepourcent));
+			players[1].socket.emit('vitesse-change', parseInt(Vitessepourcent));
 		}
     });
 
@@ -179,8 +181,11 @@ io.sockets.on('connection', function (socket) {
 	//On verifie si on a bien toujours 2 joueurs
 
 	if(players.length == 2 && player.number == 0) {
-	    if(ball.x <= (playerWidth + ballRadius)) {		
-			if(players[0].position > ball.y || (players[0].position + playerHeight) < ball.y) {
+		
+
+		
+	    if(ball.x < (playerWidth + ballRadius)) {		
+			if(players[0].position >= ball.y || (players[0].position + playerHeight) <= ball.y) {
 				//Le joueur 1 a perdu la partie
 				//console.log('player 1 lost - reset ball posigion');
 				ScoreBleu++;
@@ -199,9 +204,11 @@ io.sockets.on('connection', function (socket) {
 		//On demande une animation
 		squish();
 	    }
+		
+		
 	    if(ball.x >= (fieldWidth - playerWidth - ballRadius)) {
 		// player 2 side
-			if(players[1].position > ball.y || (players[1].position + playerHeight) < ball.y) {
+			if(players[1].position >= ball.y || (players[1].position + playerHeight) <= ball.y) {
 				// player 2 lost
 				//console.log('player 2 lost - reset ball posigion');
 				ScoreRouge++;
@@ -209,6 +216,7 @@ io.sockets.on('connection', function (socket) {
 				players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
 				//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
 				socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge]);
+				
 				
 				ball.x = fieldWidth/2,
 				ball.y = fieldHeight/2
@@ -234,18 +242,23 @@ io.sockets.on('connection', function (socket) {
 		squish();
 	    }
 	    //console.log('player.number: ' + player.number + ', ball.x: ' + ball.x + ', ball.y: ' + ball.y + ', ballVector: ' + ballVector);
+		
 		//On met a jours la position de la balle
 		Vitesse=1+(vitesseJ1+vitesseJ2)/3;
 		
 	    ball.x += ballVector[0]*Vitesse;
 	    ball.y += ballVector[1]*Vitesse;
 		//On envoi la position au client0 point d'origine du jeu
-		
 	    players[0].socket.emit('ball-position', { 'x': ball.x, 'y': ball.y});
+		//envoi de la position de la ball a tous
+		socket.broadcast.emit('ball-position', { 'x': ball.x, 'y': ball.y});
+		//En option
 	   // players[1].socket.emit('ball-position', { 'x': ball.x, 'y': ball.y});
 	   
-	   //envoi de la position de la ball a tous
-		socket.broadcast.emit('ball-position', { 'x': ball.x, 'y': ball.y});
+
+		
+		//envoi de la position des raquettes a tous traité que par les spectateurs
+		socket.broadcast.emit('position-raquette',[players[0].position,players[1].position]);
 
 
 	}
