@@ -1,0 +1,23 @@
+{
+  "name": "PongJS",
+  "version": "1.0.0",
+  "description": "A pong game with Node JS",
+  "main": "pong-server.js",
+  "dependencies": {
+    "socket.io": "^0.9.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sanslay/PongJS.git"
+  },
+  "author": "Maxime D",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sanslay/PongJS/issues"
+  },
+  "homepage": "https://github.com/Sanslay/PongJS"
+}

@@ -206,7 +206,7 @@ io.sockets.on('connection', function (socket) {
 	    }
 		
 		
-	    if(ball.x >= (fieldWidth - playerWidth - ballRadius)) {
+	    if(ball.x > (fieldWidth - playerWidth - ballRadius)) {
 		// player 2 side
 			if(players[1].position >= ball.y || (players[1].position + playerHeight) <= ball.y) {
 				// player 2 lost

@@ -64,11 +64,7 @@
       // On cree une connection avec le socket à l'adresse
 
       var socket = io.connect(serverAddr);
-	  
-		 socket.on('disconnect', function(data) 
-		 {
-		 alert("SERVER STOP ");
-		 });
+
 
 	  //Ecoute de message de type connect lorsque on est connecter au server
       socket.on('connect', function(){
@@ -108,6 +104,13 @@
 		}
 	  });
 		
+		
+		//On envoi un message lorsque l'on perd le server
+		socket.on('disconnect', function(data) 
+		 {
+		 alert("SERVER STOP ");
+		 });
+		 
 		//On attend les positions joueur adverse
 	  socket.on('opponents-position', function(data) {
 	      players[(player + 1) % 2].attr("y", data);

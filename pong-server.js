@@ -138,7 +138,7 @@ io.sockets.on('connection', function (socket) {
 			
 			//Si le joueur 1 se deconnecte
 			
-			if(player.number==1 )
+			if(player.number==1 ) 
 			{
 				nbj--;
 				console.log('Deconnection joueur 1 ');
