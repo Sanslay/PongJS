@@ -30,7 +30,7 @@ function handler (req, res) {
 }
 
 
-//Pour optenir l'adresse du server
+
 function getIPAddress() 
 	{
 	  var interfaces = require('os').networkInterfaces();

@@ -29,8 +29,6 @@ function handler (req, res) {
 	});
 }
 
-var ip = require("ip");
-console.dir ( ip.address() );
 
 //Pour optenir l'adresse du server
 function getIPAddress() 
