@@ -52,12 +52,13 @@ io.sockets.on('connection', function (socket) {
 	//On gere l'histoire des joueurs
     console.log('Connection d un nouveau joueur: '+ address.address + " : " + address.port);
     var players;
-	
+	var visiteurs = [];
 	
 
     if(games[games.length - 1].length >= 2) 
 	{
 		players = [];
+		;
 		games.push(players);
     }
 	else 
@@ -84,6 +85,7 @@ io.sockets.on('connection', function (socket) {
 	else
 	{
 		player = {'number': 3,'position': 0,'socket': socket}
+		visiteurs.push(player);
 		socket.emit('player-number', 3);
 		nbvisiteur++;
 		console.log('Connection du visiteur: '+nbvisiteur);
@@ -171,6 +173,7 @@ io.sockets.on('connection', function (socket) {
 				console.log('Deconnection joueur 1 ');
 				data=player.number ;
 				players[0].socket.emit('opponent-disconnected', data);
+				visiteurs[0].socket.emit('opponent-disconnected', data);
 				
 			}
 			//Si le joueur 0 se deconnecte
@@ -182,16 +185,17 @@ io.sockets.on('connection', function (socket) {
 					{
 						data=player.number ;
 						players[1].socket.emit('opponent-disconnected', data);
+						visiteurs[0].socket.emit('opponent-disconnected', data);
 					}
 				nbj--;
 				console.log('Deconnection joueur 0 ');
-
 			}
 			//Un visiteur se deco
 			if(player.number==3)
 			{
 				console.log('Deconnection d un visiteur ');
 				nbvisiteur--;
+				
 			}
 		}
     });
