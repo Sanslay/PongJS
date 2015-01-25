@@ -5,7 +5,9 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
 	
   </head>
-  
+  <title>
+    PongJS
+</title>
   <body>
     <script type="text/javascript">
 		
@@ -75,7 +77,7 @@
 			//On recupere le nombre de joueur
 	      player = data;
 		 
-		console.log("Vous etes le joueur"+ player);
+		
 		
 		   var cell, ligne;
  
@@ -91,15 +93,18 @@
 		if(player==0)
 		{
 		cell.innerHTML = "Vous etes le  joueur bleu" ;
+		console.log("Vous etes le joueur: "+ 0);
 		}
 		if(player==1) 
 		{
 		cell.innerHTML = "Vous etes le joueur rouge" ;
+		console.log("Vous etes le joueur: "+ 1);
 		}
 		if(player==3)
 		{
 		cell.innerHTML = "Vous etes un visiteur le jeu et deja en cours" ;
 		document.body.removeChild(document.getElementById('idboutonpret'));
+		console.log("Vous etes le joueur: visiteur");
 
 		}
 	  });
@@ -111,7 +116,7 @@
 		 alert("SERVER STOP ");
 		 });
 		 
-		//On attend les positions joueur adverse
+		//On attend les positions joueurs adverse
 	  socket.on('opponents-position', function(data) {
 	      players[(player + 1) % 2].attr("y", data);
 	  });
@@ -165,7 +170,6 @@
 		{		
 		tableau.deleteRow(-1)
 		}
-
 
 		ligne = tableau.insertRow(-1); // création d'une ligne pour ajout en fin de table
 		
@@ -231,9 +235,8 @@
 		  }
 		}	
 		
-		function Pret()			
+		function BoutonPret()			
 		{	
-			console.log("boutonPret");
 			data=player;
 			socket.emit('joueur-pret', data);
 			document.body.removeChild(document.getElementById('idboutonpret'));
@@ -259,7 +262,7 @@
 	<tr>
 	</tr>
 	</table>
-	<button id="idboutonpret" style="margin-left: 1200px; margin-top: 400px;"onclick="javascript:Pret();">Pret ?</button>
+	<button id="idboutonpret" style="margin-left: 1200px; margin-top: 400px;"onclick="javascript:BoutonPret();">Pret ?</button>
 	<table id="idStatutjoueur" style="  margin-left: 800px; margin-width: 00px; margin-top: -25px;">
 	<tr>
 	</tr>

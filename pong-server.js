@@ -11,8 +11,10 @@ var app = require('http').createServer(handler)
 , fs = require('fs');
 // logging		Je sais pas trop à quoi sa sert
 io.set('log level', 1);
+
 //Ecoute le port 8080
 app.listen(port);
+
 //On crée cette fonction pour envoyer les pages html voulues
 function handler (req, res) {
 
@@ -27,7 +29,25 @@ function handler (req, res) {
 	});
 }
 
-// parametre des trucs de base doit etre les memes que le client
+
+//Pour optenir l'adresse du server
+function getIPAddress() 
+	{
+	  var interfaces = require('os').networkInterfaces();
+	  for (var devName in interfaces) {
+		var iface = interfaces[devName];
+
+		for (var i = 0; i < iface.length; i++) {
+		  var alias = iface[i];
+		  if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal)
+			return alias.address;
+		}
+	  }
+
+	  return '0.0.0.0';
+	}
+
+// parametre du jeu de base doit etre les memes que le client
 var fieldWidth = 800;
 var fieldHeight = 500;
 var ballRadius = 20;
@@ -43,18 +63,21 @@ var nbj=0;
 var nbvisiteur=0;
 var joueur0Pret=0;
 var joueur1Pret=0;
-//Lorsque l'on envoie un message au client lorsqu'il vient de se connecter
+
+
+console.log("Le serveur vient d'etre lance à l'adresse :"+getIPAddress());
+
+//Un evenement de connection au server
 io.sockets.on('connection', function (socket) {
 	
 // Mes événements lorsque le client est connecté !
 	var address = socket.handshake.address;
-	
+
 	//On gere l'histoire des joueurs
     console.log('Connection d un nouveau joueur: '+ address.address + " : " + address.port);
     var players;
 	
 	
-
     if(games[games.length - 1].length >= 2) 
 	{
 		players = [];
@@ -64,10 +87,11 @@ io.sockets.on('connection', function (socket) {
 	{
 		players = games[games.length - 1];
     }
-	//On defini un joueur par son numero sa positio et son socket
+	
+	//On defini un joueur par son numero sa position et son socket
     var player = {'number': players.length,'position': 0,'socket': socket}
 
-	//Si il y a moins de 2 joueurs , il y a que 1 joueur possible en jeu 
+	//Si il y a moins de 2 joueurs , il y a que 1 joueur possible en jeu  on crée de joueur
 	if(nbj<2)
 	{
 		Vitesse=1;
@@ -80,16 +104,18 @@ io.sockets.on('connection', function (socket) {
     socket.emit('player-number', player.number);
 		
 	}
-	//si il y a 2 joueurs on defini le joueur comme 3 ou encore visiteur
+	//si il y a 2 joueurs on defini le joueur comme 3 ou encore spectateurs
 	else
 	{
+		//Le spectateur ne fera pas partie de la liste de joueur
 		player = {'number': 3,'position': 0,'socket': socket}
 		socket.emit('player-number', 3);
 		nbvisiteur++;
 		console.log('Connection du visiteur: '+nbvisiteur);
 		
 	}
-	console.log('Le nombre de joueur est de  '+ nbj);
+	
+	//console.log('Le nombre de joueur est de  '+ nbj);
 
 
     // On envoi la position du joueur a partir du moment ou il en a 2
@@ -102,7 +128,8 @@ io.sockets.on('connection', function (socket) {
 			player.position = data;
 		}
     });
-	//On recoi les vitesses venant des joueurs
+	
+	//On attend les vitesses venant des joueurs
 	socket.on('game-vitesse', function(data) 
 	{
 		if(nbj==2)
@@ -123,42 +150,39 @@ io.sockets.on('connection', function (socket) {
 		}
     });
 	
-	//On recoi la commande que le joueur et pret
+	//On attend la commande que le joueur et pret
 	socket.on('joueur-pret', function(data) 
 	{
-				if(data==0)
-				{
-					joueur0Pret=1;
+		if(data==0)
+		{
+			joueur0Pret=1;
 
-					console.log("joueur0pret");
-				}
-				if(data==1)
-				{
-					
-					joueur1Pret=1;
-					console.log("joueur1pret");
-				}
+		}
+		if(data==1)
+		{
+			joueur1Pret=1;
+
+		}
 				
-			//players[0].socket.emit('vitesse-change', parseInt(Vitessepourcent));
-			//players[1].socket.emit('vitesse-change', parseInt(Vitessepourcent));
+		//players[0].socket.emit('vitesse-change', parseInt(Vitessepourcent));
+		//players[1].socket.emit('vitesse-change', parseInt(Vitessepourcent));
 			
 		
     });
 
     //Quand un client ce deconnecte
     socket.on('disconnect', function(data) 
-	{
-		
-					
+	{		
 		//On verifie si ce n'est pas une erreur 
 		if(players.length <= 2 ) 
 		{
-			
 			//On arrete le cycle du jeu si il est en fonctionnement
 			clearInterval(Boucle);
+			
 			//score a 0
 			ScoreBleu=0;
 			ScoreRouge=0;
+			
 			//On donne une vitesse de 0 à la balle
 			ballVector = [0, 0]
 			
@@ -171,8 +195,8 @@ io.sockets.on('connection', function (socket) {
 				console.log('Deconnection joueur 1 ');
 				data=player.number ;
 				players[0].socket.emit('opponent-disconnected', data);
-				
 			}
+			
 			//Si le joueur 0 se deconnecte
 			console.log('Le nombre de joueur est de  '+ nbj);
 			if(player.number==0 )
@@ -187,6 +211,7 @@ io.sockets.on('connection', function (socket) {
 				console.log('Deconnection joueur 0 ');
 
 			}
+			
 			//Un visiteur se deco
 			if(player.number==3)
 			{
@@ -200,16 +225,16 @@ io.sockets.on('connection', function (socket) {
 
 	//La position de la balle au depart en direction
     var ballVector = [2,2];
-    ball = {
-	'x': fieldWidth / 2, 
-	'y': fieldHeight / 2
-    };
+    ball = {'x': fieldWidth / 2,'y': fieldHeight / 2};
+	
 	//Toute les interval de 5 msS on fait Boucle
     var Boucle = setInterval(function() {
 	//On verifie si on a bien toujours 2 joueurs
-		if(joueur0Pret==1 && joueur1Pret==1) {
+		if(joueur0Pret==1 && joueur1Pret==1) 
+		{
 
-			if(players.length == 2 && player.number == 0) {
+			if(players.length == 2 && player.number == 0) 
+			{
 
 				if(ball.x < (playerWidth + ballRadius)) 
 				{		
@@ -304,5 +329,7 @@ io.sockets.on('connection', function (socket) {
 	players[0].socket.emit('squish');
 	players[1].socket.emit('squish');
     }
+	
 
 });
+
