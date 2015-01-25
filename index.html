@@ -54,12 +54,17 @@
 	  var paperText= Raphael(85, 350, pWidth1, pHeight1);
 	  //Bordure
 	 // var rec = paper1.rect(0, 0, pWidth1, pHeight1, 5);
-
+	  //texte
+	  var texte=paperText.text(140,10,"");
+		texte.attr('font-size',16);
+	//On part du principe que l'on a 2 joueur
       var players = [p1, p2];
-      	  
+      
+	  
       // On cree une connection avec le socket à l'adresse
 
       var socket = io.connect(serverAddr);
+
 
 	  //Ecoute de message de type connect lorsque on est connecter au server
       socket.on('connect', function(){
@@ -71,8 +76,10 @@
 	  socket.on('player-number', function(data) {
 			//On recupere le nombre de joueur
 	      player = data;
-
-		  var cell, ligne;
+		 
+		console.log("Vous etes le joueur"+ player);
+		
+		   var cell, ligne;
  
 		//On crée le html d'info joueur
 		var tableau = document.getElementById("idStatutjoueur");
@@ -86,18 +93,15 @@
 		if(player==0)
 		{
 		cell.innerHTML = "Vous etes le  joueur bleu" ;
-		console.log("Vous etes le joueur: "+ 0);
 		}
 		if(player==1) 
 		{
 		cell.innerHTML = "Vous etes le joueur rouge" ;
-		console.log("Vous etes le joueur: "+ 1);
 		}
 		if(player==3)
 		{
 		cell.innerHTML = "Vous etes un visiteur le jeu et deja en cours" ;
 		document.body.removeChild(document.getElementById('idboutonpret'));
-		console.log("Vous etes le joueur: visiteur");
 
 		}
 	  });
@@ -109,7 +113,7 @@
 		 alert("SERVER STOP ");
 		 });
 		 
-		//On attend les positions joueurs adverse
+		//On attend les positions joueur adverse
 	  socket.on('opponents-position', function(data) {
 	      players[(player + 1) % 2].attr("y", data);
 	  });
@@ -163,6 +167,7 @@
 		{		
 		tableau.deleteRow(-1)
 		}
+
 
 		ligne = tableau.insertRow(-1); // création d'une ligne pour ajout en fin de table
 		
@@ -228,17 +233,15 @@
 		  }
 		}	
 		
-		function BoutonPret()			
+		function Pret()			
 		{	
+			console.log("boutonPret");
 			data=player;
 			socket.emit('joueur-pret', data);
 			document.body.removeChild(document.getElementById('idboutonpret'));
-			document.getElementById("idStatutjoueur").deleteRow(-1);
-
-			
+			//document.getElementById("idStatutjoueur").deleteRow(-1);
 
 		}
-
 
     </script>
 	<h1 style="margin-left: 100px;">Jeu PING PONG</h1>
@@ -255,12 +258,11 @@
 	<tr>
 	</tr>
 	</table>
-	<button id="idboutonpret" style="margin-left: 1200px; margin-top: 400px;"onclick="javascript:BoutonPret();">Pret ?</button>
-	<table id="idStatutjoueur" style="  margin-left: 800px; margin-width: 00px; margin-top: -25px;">
+	<table id="idStatutjoueur" style="  margin-left: 800px; margin-top: 350px;">
 	<tr>
 	</tr>
 	</table>
-
+	<button id="idboutonpret" style="margin-left: 800px;width:180px;" onclick="javascript:Pret();">Pret ?</button>
 	
   </body>
   
