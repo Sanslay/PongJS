@@ -11,6 +11,7 @@ PongJS
 <body>
 <script type="text/javascript">
 
+ 
 
 //ADRESSE DU SERVER FIXE A CHANGER
 // Configuration de la page web
@@ -95,11 +96,142 @@ cell = ligne.insertCell(0);
 if(player==0)
 {
 cell.innerHTML = "Vous etes le  joueur bleu" ;
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+
+cell.innerHTML = "Name" ;
+
+//creationinput
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+var input = document.createElement("input" ) ;
+        input.type = "text" ;
+        input.value = "Name?" ;
+        input.name = "idname" ;
+		input.style=	"width:180px;";
+        input.setAttribute("onClick","javascript:Pret();") ;
+
+		cell.appendChild(input) ;
+		
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+		
+var combo = document.createElement("select" ) ;
+        combo.type = "text" ;
+		combo.name="thelist";
+        combo.id = "thelists" ;
+        combo.setAttribute("onChange","combo(this)") ;
+		cell.appendChild(combo) ;
+var myselect = document.getElementById('thelists');
+myselect.add(new Option("Tres Facile", "0"));
+myselect.add(new Option("Facile", "0"));
+myselect.add(new Option("Moyen", "0"));
+myselect.add(new Option("Difficile", "0"));
+myselect.add(new Option("Tres Difficile", "0"));
+		
+
+
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+
+cell.innerHTML = "Score" ;
+//creationinput
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+
+var input = document.createElement("input" ) ;
+        input.type = "text" ;
+        input.value = "Score?" ;
+        input.name = "idscore" ;
+		input.style=	"width:180px;";
+        input.setAttribute("onClick","javascript:Pret();") ;
+
+		cell.appendChild(input) ;
+		
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+
+
+//creationbouton
+var button = document.createElement("input" ) ;
+        button.type = "button" ;
+        button.value = "Pret?" ;
+        button.name = "idname" ;
+		button.style=	"width:180px;";
+        button.setAttribute("onClick","javascript:Pret();") ;
+
+		cell.appendChild(button) ;	
+
 }
 if(player==1)
 {
 cell.innerHTML = "Vous etes le joueur rouge" ;
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+
+cell.innerHTML = "Name" ;
+
+//creationinput
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+var input = document.createElement("input" ) ;
+        input.type = "text" ;
+        input.value = "Name?" ;
+        input.name = "idname" ;
+		input.style=	"width:180px;";
+        input.setAttribute("onClick","javascript:Pret();") ;
+
+		cell.appendChild(input) ;
+		
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+		
+var combo = document.createElement("select" ) ;
+        combo.type = "text" ;
+		combo.name="thelist";
+        combo.id = "thelists" ;
+        combo.setAttribute("onChange","combo(this)") ;
+		cell.appendChild(combo) ;
+var myselect = document.getElementById('thelists');
+myselect.add(new Option("Tres Facile", "0"));
+myselect.add(new Option("Facile", "0"));
+myselect.add(new Option("Moyen", "0"));
+myselect.add(new Option("Difficile", "0"));
+myselect.add(new Option("Tres Difficile", "0"));
+		
+
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+
+cell.innerHTML = "Score" ;
+//creationinput
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+
+var input = document.createElement("input" ) ;
+        input.type = "text" ;
+        input.value = "Score?" ;
+        input.name = "idscore" ;
+		input.style=	"width:180px;";
+        input.setAttribute("onClick","javascript:Pret();") ;
+
+		cell.appendChild(input) ;
+
+ligne = tableau.insertRow(-1);
+cell = ligne.insertCell(0);
+
+//creationbouton
+var button = document.createElement("input" ) ;
+        button.type = "button" ;
+        button.value = "Pret?" ;
+        button.name = "idname" ;
+		button.style=	"width:180px;";
+        button.setAttribute("onClick","javascript:Pret();") ;
+
+		cell.appendChild(button) ;
+	
 }
+
 if(player==3)
 {
 cell.innerHTML = "Vous etes un visiteur le jeu et deja en cours" ;
@@ -240,8 +372,7 @@ function Pret()
 console.log("boutonPret");
 data=player;
 socket.emit('joueur-pret', data);
-document.body.removeChild(document.getElementById('idboutonpret'));
-//document.getElementById("idStatutjoueur").deleteRow(-1);
+
 
 }
 
@@ -249,9 +380,10 @@ document.body.removeChild(document.getElementById('idboutonpret'));
 </script>
 <h1 style="margin-left: 100px;">Jeu PING PONG</h1>
 <h2 style=" margin-left: 100;">Information du jeu</h2>
+
 <button style=" margin-left: 100;" onclick="javascript:location.reload();">Recharger la page</button>
 <table id="idTable" style=" margin-left: 100px;">
-<select name="thelist" onChange="combo(this)"><option>Tres Facile</option><option>Facile</option><option>Moyen</option><option>Difficile</option> <option>Tres Difficile</option> </td >
+
 </table>
 <table id="idBox" style=" margin-left: 100px;">
 <tr>
@@ -261,19 +393,21 @@ document.body.removeChild(document.getElementById('idboutonpret'));
 <tr>
 </tr>
 </table>
-<table id="idStatutjoueur" style="  margin-left: 800px; margin-top: 350px;">
-<tr>
-</tr>
-</table>
-<button id="idboutonpret" style="margin-left: 800px;width:180px;" onclick="javascript:Pret();">Pret ?</button>
 
-<select size="10" name="decision2"style="width: 180px; border-bottom-style: solid; border-bottom-width: 0px; padding-bottom: 0px; padding-right: 0px; border-right-style: solid; margin-right: 50px; border-left-style: solid; border-right-width: 0px;">
+<select size="10" name="tchat"style="width: 180px; border-bottom-style: solid; border-bottom-width: 0px; padding-bottom: 0px; margin-left: 1320px; padding-right: 0px; border-right-style: solid; margin-right: 50px; border-left-style: solid; border-right-width: 0px;">
 	<option selected>Plan 1
 	<option>Plan 2
 	<option>Plan 3
 	<option>coucou u pu du cu
 
 </select> 
+<table id="idStatutjoueur" style="  margin-left: 800px; margin-top: 210px;">
+<tr>
+</tr>
+</table>
+
+
+
 </body>
 
 </html>
