@@ -137,8 +137,8 @@ io.sockets.on('connection', function (socket) {
 		//On met a jours la position de la balle
 		Vitesse=1+(vitesseJ1+vitesseJ2)/3;
 		var newdata=[nameJ1,nameJ2,Vitesse,scoretotal]
-		players[0].socket.emit('game', newdata);
-		players[1].socket.emit('game', newdata);	
+		players[0].socket.emit('game_etat', newdata);
+		players[1].socket.emit('game_etat', newdata);	
 		}
 
 
@@ -235,6 +235,16 @@ io.sockets.on('connection', function (socket) {
 						players[0].socket.emit('game-victoire', nameJ2);
 						//players[1].socket.emit('game-score', nameJ2);
 						socket.broadcast.emit('game-victoire', nameJ2);
+						joueur1Pret=0;
+						joueur0Pret=0;
+						nameJ1="";
+						nameJ2="";
+						Vitesse=1;
+						vitesseJ1=0;
+						vitesseJ2=0
+						ScoreBleu=0;
+						ScoreRouge=0;
+						scoretotal=0;
 						}
 						
 						ball.x = fieldWidth/2,
@@ -267,6 +277,16 @@ io.sockets.on('connection', function (socket) {
 						players[0].socket.emit('game-victoire', nameJ1);
 						//players[1].socket.emit('game-score', nameJ1);
 						socket.broadcast.emit('game-victoire', nameJ1);
+						joueur1Pret=0;
+						joueur0Pret=0;
+						nameJ1="";
+						nameJ2="";
+						Vitesse=1;
+						vitesseJ1=0;
+						vitesseJ2=0
+						ScoreBleu=0;
+						ScoreRouge=0;
+						scoretotal=0;
 						}
 						
 						ball.x = fieldWidth/2,
