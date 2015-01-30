@@ -224,6 +224,11 @@ io.sockets.on('connection', function (socket) {
 						//Le joueur 1 a perdu la partie
 						
 						ScoreBleu++;
+						//On envoi les nouveaux score
+						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
+						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
+						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
+						
 						if(ScoreBleu>=scoretotal)
 						{
 						clearInterval(Boucle);
@@ -231,16 +236,6 @@ io.sockets.on('connection', function (socket) {
 						//players[1].socket.emit('game-score', nameJ2);
 						socket.broadcast.emit('game-victoire', nameJ2);
 						}
-						else
-						{
-												
-						//On envoi les nouveaux score
-						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
-						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
-						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge]);
-						}
-
-
 						
 						ball.x = fieldWidth/2,
 						ball.y = fieldHeight/2
@@ -261,6 +256,11 @@ io.sockets.on('connection', function (socket) {
 						// player 2 lost
 
 						ScoreRouge++;
+						//On envoi les nouveaux score
+						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
+						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
+						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge]);
+						
 						if(ScoreRouge>=scoretotal)
 						{
 						clearInterval(Boucle);	
@@ -268,15 +268,6 @@ io.sockets.on('connection', function (socket) {
 						//players[1].socket.emit('game-score', nameJ1);
 						socket.broadcast.emit('game-victoire', nameJ1);
 						}
-						else
-						{
-												
-						//On envoi les nouveaux score
-						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
-						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
-						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge]);
-						}
-						
 						
 						ball.x = fieldWidth/2,
 						ball.y = fieldHeight/2

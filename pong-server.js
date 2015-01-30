@@ -225,9 +225,9 @@ io.sockets.on('connection', function (socket) {
 						
 						ScoreBleu++;
 						//On envoi les nouveaux score
-						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
+						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
 						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
-						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge]);
+						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
 						
 						if(ScoreBleu>=scoretotal)
 						{
@@ -257,9 +257,9 @@ io.sockets.on('connection', function (socket) {
 
 						ScoreRouge++;
 						//On envoi les nouveaux score
-						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
+						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
 						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
-						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge]);
+						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
 						
 						if(ScoreRouge>=scoretotal)
 						{
