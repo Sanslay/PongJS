@@ -237,6 +237,14 @@ io.sockets.on('connection', function (socket) {
 						socket.broadcast.emit('game-victoire', nameJ2);
 						joueur1Pret=0;
 						joueur0Pret=0;
+						nameJ1="";
+						nameJ2="";
+						Vitesse=1;
+						vitesseJ1=0;
+						vitesseJ2=0
+						ScoreBleu=0;
+						ScoreRouge=0;
+						scoretotal=0;
 						}
 						
 						ball.x = fieldWidth/2,
@@ -271,6 +279,14 @@ io.sockets.on('connection', function (socket) {
 						socket.broadcast.emit('game-victoire', nameJ1);
 						joueur1Pret=0;
 						joueur0Pret=0;
+						nameJ1="";
+						nameJ2="";
+						Vitesse=1;
+						vitesseJ1=0;
+						vitesseJ2=0
+						ScoreBleu=0;
+						ScoreRouge=0;
+						scoretotal=0;
 						}
 						
 						ball.x = fieldWidth/2,

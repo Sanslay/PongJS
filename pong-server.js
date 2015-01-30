@@ -231,7 +231,8 @@ io.sockets.on('connection', function (socket) {
 						
 						if(ScoreBleu>=scoretotal)
 						{
-						clearInterval(Boucle);
+						ball.x = fieldWidth/2,
+						ball.y = fieldHeight/2
 						players[0].socket.emit('game-victoire', nameJ2);
 						//players[1].socket.emit('game-score', nameJ2);
 						socket.broadcast.emit('game-victoire', nameJ2);
@@ -273,7 +274,8 @@ io.sockets.on('connection', function (socket) {
 						
 						if(ScoreRouge>=scoretotal)
 						{
-						clearInterval(Boucle);	
+						ball.x = fieldWidth/2,
+						ball.y = fieldHeight/2	
 						players[0].socket.emit('game-victoire', nameJ1);
 						//players[1].socket.emit('game-score', nameJ1);
 						socket.broadcast.emit('game-victoire', nameJ1);

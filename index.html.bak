@@ -212,6 +212,19 @@ socket.on('game-victoire', function(data)
 	{
 	console.log("victoire de: "+ data);
 	alert("victoire de: "+ data);
+	var tableau = document.getElementById("idStatutjoueur");
+	FonctionMenu(tableau);
+	tableau = document.getElementById("idBoxvitesse");
+	
+	var nbLignes = tableau.rows.length;
+	var i =0;
+	while(i!=nbLignes)
+		{
+		tableau.deleteRow(-1)
+		i++;
+		}
+
+
 	});
 });
 
@@ -340,6 +353,10 @@ function Pret()
 		tableau.deleteRow(-1)
 		i++;
 		}
+	
+	document.getElementById("idBox").deleteRow(-1)
+
+	
 
 
 }
