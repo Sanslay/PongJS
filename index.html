@@ -107,7 +107,7 @@ cell = ligne.insertCell(0);
 var input = document.createElement("input" ) ;
         input.type = "text" ;
         input.value = "Name?" ;
-        input.name = "idname" ;
+        input.id = "idname" ;
 		input.style=	"width:180px;";
         input.setAttribute("onClick","javascript:Pret();") ;
 
@@ -118,7 +118,6 @@ cell = ligne.insertCell(0);
 		
 var combo = document.createElement("select" ) ;
         combo.type = "text" ;
-		combo.name="thelist";
         combo.id = "thelists" ;
         combo.setAttribute("onChange","combo(this)") ;
 		cell.appendChild(combo) ;
@@ -142,6 +141,7 @@ cell = ligne.insertCell(0);
 var input = document.createElement("input" ) ;
         input.type = "text" ;
         input.value = "Score?" ;
+		input.id = "textScore" ;
         input.name = "idscore" ;
 		input.style=	"width:180px;";
         input.setAttribute("onClick","javascript:Pret();") ;
@@ -156,7 +156,7 @@ cell = ligne.insertCell(0);
 var button = document.createElement("input" ) ;
         button.type = "button" ;
         button.value = "Pret?" ;
-        button.name = "idname" ;
+        button.name = "idPret" ;
 		button.style=	"width:180px;";
         button.setAttribute("onClick","javascript:Pret();") ;
 
@@ -176,8 +176,8 @@ ligne = tableau.insertRow(-1);
 cell = ligne.insertCell(0);
 var input = document.createElement("input" ) ;
         input.type = "text" ;
+		input.id = "idname" ;;
         input.value = "Name?" ;
-        input.name = "idname" ;
 		input.style=	"width:180px;";
         input.setAttribute("onClick","javascript:Pret();") ;
 
@@ -211,6 +211,7 @@ cell = ligne.insertCell(0);
 var input = document.createElement("input" ) ;
         input.type = "text" ;
         input.value = "Score?" ;
+		input.id = "textScore" ;
         input.name = "idscore" ;
 		input.style=	"width:180px;";
         input.setAttribute("onClick","javascript:Pret();") ;
@@ -356,7 +357,7 @@ function combo(thelist)
 {
 if(player!=3)
 {
-var vitesse = thelist.selectedIndex;
+var vitesse = thelists.selectedIndex;
 var data=[player, vitesse];
 
 socket.emit('game-vitesse', data);
@@ -370,9 +371,16 @@ alert("Il est impossible pour une visiteur de changer la vitesse");
 function Pret()
 {
 console.log("boutonPret");
+var vitesse = thelists.selectedIndex;
+data=[player,idname.value,vitesse,textScore.value]
+console.log(data);
 data=player;
-socket.emit('joueur-pret', data);
 
+socket.emit('joueur-pret', data);
+//console.log(idname.value);
+
+//console.log(vitesse);
+//console.log(textScore.value);
 
 }
 
