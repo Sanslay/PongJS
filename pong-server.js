@@ -147,16 +147,13 @@ io.sockets.on('connection', function (socket) {
     //Quand un client ce deconnecte
     socket.on('disconnect', function(data) 
 	{
-		
-					
 		//On verifie si ce n'est pas une erreur 
 		if(players.length <= 2 ) 
 		{
-			
 			//On arrete le cycle du jeu si il est en fonctionnement
 			clearInterval(Boucle);
 			//score a 0
-
+			
 			nameJ1="";
 			nameJ2="";
 			Vitesse=1;
@@ -201,7 +198,53 @@ io.sockets.on('connection', function (socket) {
 			}
 		}
     });
+	
+	
+	socket.on('game_chat', function(data) 
+	{
+		if(data[0]==0)
+		{	
+			if(nameJ1=="")
+			{
+				var text="Joueur bleu"+": "+data[1]
+			}
+			else
+			{
+				var text=nameJ1+": "+data[1]
+			}
+			//A lui
+			players[0].socket.emit('chat_reponse',text);
+			//Au autre 
+			socket.broadcast.emit('chat_reponse',text);
+		}
+		if(data[0]==1)
+		{
+			if(nameJ1=="")
+			{
+				var text="Joueur rouge"+": "+data[1]
+			}
+			else
+			{
+				var text=nameJ2+": "+data[1]
+			}
+			//A lui 
+			players[1].socket.emit('chat_reponse',text);
+			//Au autre 
+			socket.broadcast.emit('chat_reponse',text);
+		}
+		if(data[0]==3)
+		{
+			var text="Visiteur: "+data[1]
+			//A lui 
 
+			socket.emit('chat_reponse',text);
+			//Au autre 
+			socket.broadcast.emit('chat_reponse',text);
+
+		}
+
+				
+	});
     // Le jeu commmence
 
 	//La position de la balle au depart en direction
@@ -327,8 +370,6 @@ io.sockets.on('connection', function (socket) {
 				socket.broadcast.emit('ball-position', { 'x': ball.x, 'y': ball.y});
 				//En option
 			   // players[1].socket.emit('ball-position', { 'x': ball.x, 'y': ball.y});
-			   
-
 				
 				//envoi de la position des raquettes a tous traité que par les spectateurs
 				socket.broadcast.emit('position-raquette',[players[0].position,players[1].position]);
@@ -337,7 +378,7 @@ io.sockets.on('connection', function (socket) {
 			}
 		}
     
-	}, 1);
+	}, 5);
 
     function squish() {
 	//console.log('squish');

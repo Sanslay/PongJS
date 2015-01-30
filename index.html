@@ -15,7 +15,7 @@ PongJS
 
 //ADRESSE DU SERVER FIXE A CHANGER
 // Configuration de la page web
-var serverAddr = '172.17.174.125:8080';
+var serverAddr = '192.168.1.53:8080';
 // Configuration du paper Raphael: TAILLE
 var pWidth = 800;
 var pHeight = 500;
@@ -180,6 +180,12 @@ var anim = Raphael.animation({r: ballRadius}, 500, "bounce");
 
 ball.attr('r', ballRadius - 5);
 ball.animate(anim);
+});
+
+socket.on('chat_reponse', function(data) {
+	var ZoneChat = document.getElementById('chat');
+	var LeMessage = document.getElementById('message');
+	ZoneChat.add(new Option(data));
 });
 
 socket.on('game_etat', function(data) 
@@ -354,12 +360,19 @@ function Pret()
 		document.getElementById("idBox").deleteRow(-1)
 		i++;
 		}
-	
-	
+}
+function chat(event)
+{
+	if ( event.which==13 ) {
+		var ZoneChat = document.getElementById('chat');
+		var LeMessage = document.getElementById('message');
+
+		data=[player,LeMessage.value]
+		LeMessage.value="";
+		socket.emit('game_chat', data);
 
 	
-
-
+	}
 }
 
 
@@ -368,9 +381,7 @@ function Pret()
 <h2 style=" margin-left: 100;">Information du jeu</h2>
 
 <button style=" margin-left: 100;" onclick="javascript:location.reload();">Recharger la page</button>
-<table id="idTable" style=" margin-left: 100px;">
 
-</table>
 <table id="idBox" style=" margin-left: 100px;">
 <tr>
 </tr>
@@ -380,14 +391,11 @@ function Pret()
 </tr>
 </table>
 
-<select size="10" name="tchat"style="width: 180px; border-bottom-style: solid; border-bottom-width: 0px; padding-bottom: 0px; margin-left: 1320px; padding-right: 0px; border-right-style: solid; margin-right: 50px; border-left-style: solid; border-right-width: 0px;">
-	<option selected>Plan 1
-	<option>Plan 2
-	<option>Plan 3
-	<option>coucou u pu du cu
+<select id="chat" size="15" name="tchat"style="width: 200px; border-bottom-style: solid; border-bottom-width: 0px; padding-bottom: 0px; margin-left: 1300px; padding-right: 0px; border-right-style: solid; margin-right: 0px; border-left-style: solid; border-right-width: 0px;">
 
 </select> 
-<table id="idStatutjoueur" style="  margin-left: 100px; margin-bottom: 0px; margin-top: 100px;">
+<input onkeypress= "return(chat(event));" id="message" type="text" name="input" value="Entrez du texte ici" style="margin-left: 1320px;">
+<table id="idStatutjoueur" style="  margin-left: 100px; margin-bottom: 0px;">
 <tr>
 </tr>
 </table>
