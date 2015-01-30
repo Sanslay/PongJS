@@ -43,6 +43,11 @@ var nbj=0;
 var nbvisiteur=0;
 var joueur0Pret=0;
 var joueur1Pret=0;
+var scoretotal=0;
+var scoreJ1=0;
+var scoreJ2=0;
+var nameJ1="";
+var nameJ2="";
 //Lorsque l'on envoie un message au client lorsqu'il vient de se connecter
 io.sockets.on('connection', function (socket) {
 	
@@ -102,47 +107,41 @@ io.sockets.on('connection', function (socket) {
 			player.position = data;
 		}
     });
-	//On recoi les vitesses venant des joueurs
-	socket.on('game-vitesse', function(data) 
-	{
-		if(nbj==2)
-		{
-				if(data[0]==0)
-				{
-					vitesseJ1=data[1];
-				}
-				if(data[0]==1)
-				{
-					vitesseJ2=data[1];
-				}
-			Vitesse=1+(vitesseJ1+vitesseJ2)/3;
-			var Vitessepourcent = Vitesse*100
-			
-			players[0].socket.emit('vitesse-change', parseInt(Vitessepourcent));
-			players[1].socket.emit('vitesse-change', parseInt(Vitessepourcent));
-		}
-    });
 	
 	//On recoi la commande que le joueur et pret
 	socket.on('joueur-pret', function(data) 
 	{
-				if(data==0)
+		//data=[player,idname.value,vitesse,textScore.value]
+				if(data[0]==0)
 				{
 					joueur0Pret=1;
+					vitesseJ1=data[2];
+					scoreJ1=parseInt(data[3]);
+					nameJ1=data[1];
+					scoretotal	=parseInt(scoreJ1)+parseInt(scoretotal)		
 
-					console.log("joueur0pret");
 				}
-				if(data==1)
+				if(data[0]==1)
 				{
 					
 					joueur1Pret=1;
-					console.log("joueur1pret");
+					vitesseJ2=data[2];
+					nameJ2=data[1];
+					scoreJ2=parseInt(data[3]);
+					scoretotal	=parseInt(scoreJ2)+parseInt(scoretotal)	
 				}
-				
-			//players[0].socket.emit('vitesse-change', parseInt(Vitessepourcent));
-			//players[1].socket.emit('vitesse-change', parseInt(Vitessepourcent));
-			
-		
+						
+
+		if(joueur0Pret==1 && joueur1Pret==1) 
+		{
+		//On met a jours la position de la balle
+		Vitesse=1+(vitesseJ1+vitesseJ2)/3;
+		var newdata=[nameJ1,nameJ2,Vitesse,scoretotal]
+		players[0].socket.emit('game', newdata);
+		players[1].socket.emit('game', newdata);	
+		}
+
+
     });
 
     //Quand un client ce deconnecte
@@ -157,8 +156,15 @@ io.sockets.on('connection', function (socket) {
 			//On arrete le cycle du jeu si il est en fonctionnement
 			clearInterval(Boucle);
 			//score a 0
+
+			nameJ1="";
+			nameJ2="";
+			Vitesse=1;
+			vitesseJ1=0;
+			vitesseJ2=0
 			ScoreBleu=0;
 			ScoreRouge=0;
+			scoretotal=0;
 			//On donne une vitesse de 0 à la balle
 			ballVector = [0, 0]
 			
@@ -216,13 +222,20 @@ io.sockets.on('connection', function (socket) {
 					if(players[0].position >= ball.y || (players[0].position + playerHeight) <= ball.y) 
 					{
 						//Le joueur 1 a perdu la partie
-						//console.log('player 1 lost - reset ball posigion');
-						ScoreBleu++;
 						
+						ScoreBleu++;
 						//On envoi les nouveaux score
 						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
 						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
 						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge]);
+						
+						if(ScoreBleu>=scoretotal)
+						{
+						clearInterval(Boucle);
+						players[0].socket.emit('game-victoire', nameJ2);
+						//players[1].socket.emit('game-score', nameJ2);
+						socket.broadcast.emit('game-victoire', nameJ2);
+						}
 						
 						ball.x = fieldWidth/2,
 						ball.y = fieldHeight/2
@@ -241,13 +254,20 @@ io.sockets.on('connection', function (socket) {
 					if(players[1].position >= ball.y || (players[1].position + playerHeight) <= ball.y) 
 					{
 						// player 2 lost
-						//console.log('player 2 lost - reset ball posigion');
+
 						ScoreRouge++;
-						
+						//On envoi les nouveaux score
 						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
 						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
 						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge]);
 						
+						if(ScoreRouge>=scoretotal)
+						{
+						clearInterval(Boucle);	
+						players[0].socket.emit('game-victoire', nameJ1);
+						//players[1].socket.emit('game-score', nameJ1);
+						socket.broadcast.emit('game-victoire', nameJ1);
+						}
 						
 						ball.x = fieldWidth/2,
 						ball.y = fieldHeight/2
@@ -276,9 +296,7 @@ io.sockets.on('connection', function (socket) {
 				}
 				//console.log('player.number: ' + player.number + ', ball.x: ' + ball.x + ', ball.y: ' + ball.y + ', ballVector: ' + ballVector);
 				
-				//On met a jours la position de la balle
-				Vitesse=1+(vitesseJ1+vitesseJ2)/3;
-				
+			
 				ball.x += ballVector[0]*Vitesse;
 				ball.y += ballVector[1]*Vitesse;
 				//On envoi la position au client0 point d'origine du jeu
