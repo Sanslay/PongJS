@@ -15,7 +15,8 @@ PongJS
 
 //ADRESSE DU SERVER FIXE A CHANGER
 // Configuration de la page web
-var serverAddr = '192.168.1.53:8080';
+//var serverAddr = 'http://pongjs.dynamic-dns.net:8080/';
+var serverAddr = '192.168.1.53:8080/';
 // Configuration du paper Raphael: TAILLE
 var pWidth = 800;
 var pHeight = 500;
@@ -119,6 +120,18 @@ socket.on('disconnect', function(data)
 alert("SERVER STOP ");
 });
 
+//On envoi un message lorsque l'on perd le server
+socket.on('game_pret', function(data)
+{
+	var ZoneChat = document.getElementById('chat');
+	var LeMessage = document.getElementById('message');
+	//data=[player,idname.value,vitesse,textScore.value]
+	ZoneChat.add(new Option("Log SERVER:"));
+	ZoneChat.add(new Option("Le joueur "+data[1]+" est pret"));
+	ZoneChat.add(new Option("Il a choisi une vitesse de "+data[2]));
+	ZoneChat.add(new Option("Pour atteindre le score de "+data[3]));
+});
+
 //On attend les positions joueur adverse
 socket.on('opponents-position', function(data) {
 players[(player + 1) % 2].attr("y", data);
@@ -219,7 +232,11 @@ socket.on('game-victoire', function(data)
 	console.log("victoire de: "+ data);
 	alert("victoire de: "+ data);
 	var tableau = document.getElementById("idStatutjoueur");
-	FonctionMenu(tableau);
+	if(player!=3)
+	{
+		FonctionMenu(tableau);
+	}
+
 	tableau = document.getElementById("idBoxvitesse");
 	
 	var nbLignes = tableau.rows.length;
@@ -342,7 +359,6 @@ function FonctionMenu(tableau)
 function Pret()
 {
 	
-	console.log("boutonPret");
 	var vitesse = thelists.selectedIndex;
 	var score=thelistscore.selectedIndex+1;
 	data=[player,idname.value,vitesse,score]
@@ -360,6 +376,9 @@ function Pret()
 		document.getElementById("idBox").deleteRow(-1)
 		i++;
 		}
+
+	titreTchat.innerHTML="Tchat("+data[1]+")";
+
 }
 function chat(event)
 {
@@ -390,8 +409,8 @@ function chat(event)
 <tr>
 </tr>
 </table>
-
-<select id="chat" size="15" name="tchat"style="width: 200px; border-bottom-style: solid; border-bottom-width: 0px; padding-bottom: 0px; margin-left: 1300px; padding-right: 0px; border-right-style: solid; margin-right: 0px; border-left-style: solid; border-right-width: 0px;">
+<h2 id="titreTchat" style=" margin-left: 1350px;">Tchat</h2>
+<select id="chat" size="15" name="tchat"style="width: 220px; border-bottom-style: solid; border-bottom-width: 0px; padding-bottom: 0px; margin-left: 1300px; padding-right: 0px; border-right-style: solid; margin-right: 0px; border-left-style: solid; border-right-width: 0px;">
 
 </select> 
 <input onkeypress= "return(chat(event));" id="message" type="text" name="input" value="Entrez du texte ici" style="margin-left: 1320px;">

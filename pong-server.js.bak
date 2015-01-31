@@ -118,7 +118,18 @@ io.sockets.on('connection', function (socket) {
 					vitesseJ1=data[2];
 					scoreJ1=parseInt(data[3]);
 					nameJ1=data[1];
-					scoretotal	=parseInt(scoreJ1)+parseInt(scoretotal)		
+					scoretotal	=parseInt(scoreJ1)+parseInt(scoretotal)
+					//On lance une boucle le temps que le joueur 2 se connecte
+					var BouclePret = setInterval(function() {		
+						if(nbj==2)
+						{
+
+							players[1].socket.emit('game_pret',data);
+
+						clearInterval(BouclePret);
+						}
+					},20);
+
 
 				}
 				if(data[0]==1)
@@ -129,6 +140,15 @@ io.sockets.on('connection', function (socket) {
 					nameJ2=data[1];
 					scoreJ2=parseInt(data[3]);
 					scoretotal	=parseInt(scoreJ2)+parseInt(scoretotal)	
+					//On lance une boucle le temps que le joueur 1 se connecte
+					var BouclePret = setInterval(function() {		
+						if(nbj==2)
+						{
+						players[0].socket.emit('game_pret',nameJ2);
+						clearInterval(BouclePret);
+						}
+					},20);
+
 				}
 						
 
@@ -137,8 +157,11 @@ io.sockets.on('connection', function (socket) {
 		//On met a jours la position de la balle
 		Vitesse=1+(vitesseJ1+vitesseJ2)/3;
 		var newdata=[nameJ1,nameJ2,Vitesse,scoretotal]
+
 		players[0].socket.emit('game_etat', newdata);
 		players[1].socket.emit('game_etat', newdata);	
+
+
 		}
 
 
@@ -147,16 +170,13 @@ io.sockets.on('connection', function (socket) {
     //Quand un client ce deconnecte
     socket.on('disconnect', function(data) 
 	{
-		
-					
 		//On verifie si ce n'est pas une erreur 
 		if(players.length <= 2 ) 
 		{
-			
 			//On arrete le cycle du jeu si il est en fonctionnement
 			clearInterval(Boucle);
 			//score a 0
-
+			
 			nameJ1="";
 			nameJ2="";
 			Vitesse=1;
@@ -222,7 +242,7 @@ io.sockets.on('connection', function (socket) {
 		}
 		if(data[0]==1)
 		{
-			if(nameJ1=="")
+			if(nameJ2=="")
 			{
 				var text="Joueur rouge"+": "+data[1]
 			}
