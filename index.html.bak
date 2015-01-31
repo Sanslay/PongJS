@@ -303,7 +303,10 @@ function FonctionMenu(tableau)
 	ligne = tableau.insertRow(-1);
 	cell = ligne.insertCell(0);
 	
-	cell.innerHTML = "Name" ;	
+	cell.innerHTML = "Difficulte" ;	
+		
+		ligne = tableau.insertRow(-1);
+	cell = ligne.insertCell(0);
 	var combo = document.createElement("select" ) ;
 			combo.type = "text" ;
 			combo.id = "thelists" ;

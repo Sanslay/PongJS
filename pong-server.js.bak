@@ -27,7 +27,7 @@ function handler (req, res) {
 	});
 }
 
-// parametre des trucs de base doit etre les memes que le client
+// Parametre systems
 var fieldWidth = 800;
 var fieldHeight = 500;
 var ballRadius = 20;
@@ -48,6 +48,7 @@ var scoreJ1=0;
 var scoreJ2=0;
 var nameJ1="";
 var nameJ2="";
+
 //Lorsque l'on envoie un message au client lorsqu'il vient de se connecter
 io.sockets.on('connection', function (socket) {
 	
@@ -69,6 +70,7 @@ io.sockets.on('connection', function (socket) {
 	{
 		players = games[games.length - 1];
     }
+	
 	//On defini un joueur par son numero sa positio et son socket
     var player = {'number': players.length,'position': 0,'socket': socket}
 
@@ -78,23 +80,29 @@ io.sockets.on('connection', function (socket) {
 		Vitesse=1;
 		players.push(player);
 		nbj++;
-		//console.log('Le nombre de j:'+nbj);
-		    // On affiche sur le log le numero du joueur
+
+	// On affiche sur le log le numero du joueur 
     console.log('Connection Joueur numero: ' + player.number);
-	//On envoi au server  comme donnée le numero du joueur 
+	
+	//On envoi au client son numero
     socket.emit('player-number', player.number);
 		
 	}
-	//si il y a 2 joueurs on defini le joueur comme 3 ou encore visiteur
+	//si il y a deja 2 joueurs on defini les nouveaux joueur comme 3 ou encore spectateur
 	else
 	{
-		player = {'number': 3,'position': 0,'socket': socket}
+		var spectateurs = {'number': 3,'position': 0,'socket': socket}
+		//On envoi au client son numero
 		socket.emit('player-number', 3);
-		socket.broadcast.emit('chat_reponse',"Le visiteur "+nbvisiteur+" vient d'arrive");
+		//On augmente le nombre de visiteur
 		nbvisiteur++;
+		//On affiche la connection sur le tchat
+		socket.broadcast.emit('chat_reponse',"Le visiteur "+nbvisiteur+" vient d'arrive");
+		//Affiche sur le log server
 		console.log('Connection du visiteur: '+nbvisiteur);
 		
 	}
+	
 	console.log('Le nombre de joueur est de  '+ nbj);
 
 
@@ -104,7 +112,6 @@ io.sockets.on('connection', function (socket) {
 		if(players.length == 2) 
 		{
 			players[(player.number + 1) % 2].socket.emit('opponents-position', data);
-
 			player.position = data;
 		}
     });
@@ -115,57 +122,67 @@ io.sockets.on('connection', function (socket) {
 		//data=[player,idname.value,vitesse,textScore.value]
 				if(data[0]==0)
 				{
+					//le joueur 0 est pret
 					joueur0Pret=1;
+					//On recupere sa consigne de vitesse
 					vitesseJ1=data[2];
+					//On recupere sa consigne de score
 					scoreJ1=parseInt(data[3]);
+					//On recupere son nom
 					nameJ1=data[1];
+					//On calcule le score total
 					scoretotal	=parseInt(scoreJ1)+parseInt(scoretotal)
 					//On lance une boucle le temps que le joueur 2 se connecte
 					var BouclePret = setInterval(function() {		
+						//on attend que on est sur que l'on a 2 joueurs
 						if(nbj==2)
 						{
-
+							//On renvoi les data au joueur adverse
 							players[1].socket.emit('game_pret',data);
-
-						clearInterval(BouclePret);
+							//On stock la boucle
+							clearInterval(BouclePret);
 						}
+						//toutes les 20ms
 					},20);
 
 
 				}
 				if(data[0]==1)
 				{
-					
+					//Le joueur 1 est pret
 					joueur1Pret=1;
+					//sa consigne de vitesse
 					vitesseJ2=data[2];
+					//son nom
 					nameJ2=data[1];
+					//sa consigne de score
 					scoreJ2=parseInt(data[3]);
+					//calcule du scoretotal
 					scoretotal	=parseInt(scoreJ2)+parseInt(scoretotal)	
 					//On lance une boucle le temps que le joueur 1 se connecte
 					var BouclePret = setInterval(function() {		
 						if(nbj==2)
 						{
-						players[0].socket.emit('game_pret',data);
-						clearInterval(BouclePret);
+								//On renvoi les data au joueur adverse
+							players[0].socket.emit('game_pret',data);
+							//On stock la boucle
+							clearInterval(BouclePret);
 						}
+						//toutes les 20ms
 					},20);
 
 				}
 						
-
+		//quand les 2 joueurs sont pret
 		if(joueur0Pret==1 && joueur1Pret==1) 
 		{
-		//On met a jours la position de la balle
-		Vitesse=1+(vitesseJ1+vitesseJ2)/3;
-		var newdata=[nameJ1,nameJ2,Vitesse,scoretotal]
-
-		players[0].socket.emit('game_etat', newdata);
-		players[1].socket.emit('game_etat', newdata);	
-
-
+			//Calcule de la nouvelle vitesse en fonction des consignes
+			Vitesse=1+(vitesseJ1+vitesseJ2)/3;
+			var newdata=[nameJ1,nameJ2,Vitesse,scoretotal]
+			//On renvoi les donnee au joueurs
+			players[0].socket.emit('game_etat', newdata);
+			players[1].socket.emit('game_etat', newdata);	
 		}
-
-
     });
 
     //Quand un client ce deconnecte
@@ -178,48 +195,106 @@ io.sockets.on('connection', function (socket) {
 			clearInterval(Boucle);
 			//score a 0
 			
-			nameJ1="";
-			nameJ2="";
-			Vitesse=1;
-			vitesseJ1=0;
-			vitesseJ2=0
-			ScoreBleu=0;
-			ScoreRouge=0;
-			scoretotal=0;
 			//On donne une vitesse de 0 à la balle
 			ballVector = [0, 0]
 			
-			//Si le joueur 1 se deconnecte
-			
-			if(player.number==1 ) 
+			//le nombre de visiteur doit etre avec visiteur
+			if(nbvisiteur>0)
 			{
-				joueur1Pret=0;
-				nbj--;
-				console.log('Deconnection joueur 1 ');
-				data=player.number ;
-				players[0].socket.emit('opponent-disconnected', data);
-				
+				if(player.number==1 && spectateurs.number!=3) 
+				{
+					//on reset toute les donnees
+					nameJ1="";
+					nameJ2="";
+					Vitesse=1;
+					vitesseJ1=0;
+					vitesseJ2=0
+					ScoreBleu=0;
+					ScoreRouge=0;
+					scoretotal=0;
+					
+					joueur1Pret=0;
+					nbj--;
+					console.log('Deconnection joueur 1 ');
+					data=player.number ;
+					players[0].socket.emit('opponent-disconnected', data);
+					
+				}
+				//Si le joueur 0 se deconnecte
+				console.log('Le nombre de joueur est de  '+ nbj);
+				if(player.number==0 && spectateurs.number!=3)
+				{
+					nameJ1="";
+					nameJ2="";
+					Vitesse=1;
+					vitesseJ1=0;
+					vitesseJ2=0
+					ScoreBleu=0;
+					ScoreRouge=0;
+					scoretotal=0;
+					
+					joueur0Pret=0;
+						if(nbj>1)
+						{
+							data=player.number ;
+							players[1].socket.emit('opponent-disconnected', data);
+						}
+					nbj--;
+					console.log('Deconnection joueur 0 ');
+				}
+				if(spectateurs.number==3)
+				{
+					console.log('Deconnection d un visiteur ');
+					nbvisiteur--;
+				}
+								
 			}
-			//Si le joueur 0 se deconnecte
-			console.log('Le nombre de joueur est de  '+ nbj);
-			if(player.number==0 )
+			//si on a pas de visiteur
+			else
 			{
-				joueur0Pret=0;
-					if(nbj>1)
-					{
-						data=player.number ;
-						players[1].socket.emit('opponent-disconnected', data);
-					}
-				nbj--;
-				console.log('Deconnection joueur 0 ');
-
+				if(player.number==1) 
+				{
+					nameJ1="";
+					nameJ2="";
+					Vitesse=1;
+					vitesseJ1=0;
+					vitesseJ2=0
+					ScoreBleu=0;
+					ScoreRouge=0;
+					scoretotal=0;
+					
+					joueur1Pret=0;
+					nbj--;
+					console.log('Deconnection joueur 1 ');
+					data=player.number ;
+					players[0].socket.emit('opponent-disconnected', data);
+					
+				}
+				//Si le joueur 0 se deconnecte
+				console.log('Le nombre de joueur est de  '+ nbj);
+				if(player.number==0)
+				{
+					nameJ1="";
+					nameJ2="";
+					Vitesse=1;
+					vitesseJ1=0;
+					vitesseJ2=0
+					ScoreBleu=0;
+					ScoreRouge=0;
+					scoretotal=0;
+					
+					joueur0Pret=0;
+						if(nbj>1)
+						{
+							data=player.number ;
+							players[1].socket.emit('opponent-disconnected', data);
+						}
+					nbj--;
+					console.log('Deconnection joueur 0 ');
+				}
 			}
 			//Un visiteur se deco
-			if(player.number==3)
-			{
-				console.log('Deconnection d un visiteur ');
-				nbvisiteur--;
-			}
+
 		}
     });
 	
@@ -273,16 +348,14 @@ io.sockets.on('connection', function (socket) {
 
 	//La position de la balle au depart en direction
     var ballVector = [2,2];
-    ball = {
-	'x': fieldWidth / 2, 
-	'y': fieldHeight / 2
-    };
+    ball = {'x': fieldWidth / 2, 'y': fieldHeight / 2};
 	//Toute les interval de 5 msS on fait Boucle
     var Boucle = setInterval(function() {
 	//On verifie si on a bien toujours 2 joueurs
-		if(joueur0Pret==1 && joueur1Pret==1) {
-
-			if(players.length == 2 && player.number == 0) {
+		if(joueur0Pret==1 && joueur1Pret==1) 
+		{
+			if(players.length == 2 && player.number == 0) 
+			{
 
 				if(ball.x < (playerWidth + ballRadius)) 
 				{		
@@ -295,24 +368,25 @@ io.sockets.on('connection', function (socket) {
 						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
 						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
 						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
+						console.log(ScoreBleu,scoretotal);
 						
 						if(ScoreBleu>=scoretotal)
 						{
-						ball.x = fieldWidth/2,
-						ball.y = fieldHeight/2
-						players[0].socket.emit('game-victoire', nameJ2);
-						//players[1].socket.emit('game-score', nameJ2);
-						socket.broadcast.emit('game-victoire', nameJ2);
-						joueur1Pret=0;
-						joueur0Pret=0;
-						nameJ1="";
-						nameJ2="";
-						Vitesse=1;
-						vitesseJ1=0;
-						vitesseJ2=0
-						ScoreBleu=0;
-						ScoreRouge=0;
-						scoretotal=0;
+							ball.x = fieldWidth/2,
+							ball.y = fieldHeight/2
+							players[0].socket.emit('game-victoire', nameJ2);
+							//players[1].socket.emit('game-score', nameJ2);
+							socket.broadcast.emit('game-victoire', nameJ2);
+							joueur1Pret=0;
+							joueur0Pret=0;
+							nameJ1="";
+							nameJ2="";
+							Vitesse=1;
+							vitesseJ1=0;
+							vitesseJ2=0
+							ScoreBleu=0;
+							ScoreRouge=0;
+							scoretotal=0;
 						}
 						
 						ball.x = fieldWidth/2,
@@ -332,37 +406,36 @@ io.sockets.on('connection', function (socket) {
 					if(players[1].position >= ball.y || (players[1].position + playerHeight) <= ball.y) 
 					{
 						// player 2 lost
-
 						ScoreRouge++;
 						//On envoi les nouveaux score
 						players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
 						//players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
 						socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
+						console.log(ScoreRouge,scoretotal);
 						
 						if(ScoreRouge>=scoretotal)
 						{
-						ball.x = fieldWidth/2,
-						ball.y = fieldHeight/2	
-						players[0].socket.emit('game-victoire', nameJ1);
-						//players[1].socket.emit('game-score', nameJ1);
-						socket.broadcast.emit('game-victoire', nameJ1);
-						joueur1Pret=0;
-						joueur0Pret=0;
-						nameJ1="";
-						nameJ2="";
-						Vitesse=1;
-						vitesseJ1=0;
-						vitesseJ2=0
-						ScoreBleu=0;
-						ScoreRouge=0;
-						scoretotal=0;
+							ball.x = fieldWidth/2,
+							ball.y = fieldHeight/2	
+							players[0].socket.emit('game-victoire', nameJ1);
+							//players[1].socket.emit('game-score', nameJ1);
+							socket.broadcast.emit('game-victoire', nameJ1);
+							joueur1Pret=0;
+							joueur0Pret=0;
+							nameJ1="";
+							nameJ2="";
+							Vitesse=1;
+							vitesseJ1=0;
+							vitesseJ2=0
+							ScoreBleu=0;
+							ScoreRouge=0;
+							scoretotal=0;
 						}
 						
 						ball.x = fieldWidth/2,
 						ball.y = fieldHeight/2
 					}
-					//console.log('Touche la raquette J2');
-					//console.log('negative vector.x');
+
 					ballVector[0] = -Math.abs(ballVector[0]);
 					//On demande une animation
 					squish();
