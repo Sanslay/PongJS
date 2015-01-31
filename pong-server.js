@@ -59,8 +59,6 @@ io.sockets.on('connection', function (socket) {
     console.log('Connection d un nouveau joueur: '+ address.address + " : " + address.port);
     var players;
     
-    
-
     if(games[games.length - 1].length >= 2) 
     {
         players = [];
@@ -70,7 +68,7 @@ io.sockets.on('connection', function (socket) {
     {
         players = games[games.length - 1];
     }
-    
+
     //On defini un joueur par son numero sa positio et son socket
     var player = {'number': players.length,'position': 0,'socket': socket}
 
@@ -102,7 +100,7 @@ io.sockets.on('connection', function (socket) {
         console.log('Connection du visiteur: '+nbvisiteur);
         
     }
-    
+    console.log(players);
     console.log('Le nombre de joueur est de  '+ nbj);
 
 
@@ -180,8 +178,16 @@ io.sockets.on('connection', function (socket) {
             Vitesse=1+(vitesseJ1+vitesseJ2)/3;
             var newdata=[nameJ1,nameJ2,Vitesse,scoretotal]
             //On renvoi les donnee au joueurs
-            players[0].socket.emit('game_etat', newdata);
-            players[1].socket.emit('game_etat', newdata);   
+			try
+			{
+			players[0].socket.emit('game_etat', newdata);
+            players[1].socket.emit('game_etat', newdata); 
+			}
+			catch(ex)
+			{
+				socket.broadcast.emit('game_etat', newdata);
+			}
+  
         }
     });
 
