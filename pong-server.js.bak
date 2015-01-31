@@ -90,6 +90,7 @@ io.sockets.on('connection', function (socket) {
 	{
 		player = {'number': 3,'position': 0,'socket': socket}
 		socket.emit('player-number', 3);
+		socket.broadcast.emit('chat_reponse',"Le visiteur "+nbvisiteur+" vient d'arrive");
 		nbvisiteur++;
 		console.log('Connection du visiteur: '+nbvisiteur);
 		
@@ -144,7 +145,7 @@ io.sockets.on('connection', function (socket) {
 					var BouclePret = setInterval(function() {		
 						if(nbj==2)
 						{
-						players[0].socket.emit('game_pret',nameJ2);
+						players[0].socket.emit('game_pret',data);
 						clearInterval(BouclePret);
 						}
 					},20);

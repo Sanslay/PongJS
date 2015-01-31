@@ -90,7 +90,9 @@ io.sockets.on('connection', function (socket) {
 	{
 		player = {'number': 3,'position': 0,'socket': socket}
 		socket.emit('player-number', 3);
+		
 		nbvisiteur++;
+		socket.broadcast.emit('chat_reponse',"Le visiteur "+nbvisiteur+" vient d'arrive");
 		console.log('Connection du visiteur: '+nbvisiteur);
 		
 	}
