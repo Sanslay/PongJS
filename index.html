@@ -397,6 +397,19 @@ function chat(event)
 	
 	}
 }
+function Clearchat()
+{
+	var i=0;
+	var ZoneChat = document.getElementById('chat');
+	while(i<=ZoneChat.size)
+	{
+		ZoneChat.remove(0);
+		i++;
+	}
+
+	
+	}
+
 
 
 </script>
@@ -417,7 +430,8 @@ function chat(event)
 <select id="chat" size="15" name="tchat"style="width: 220px; border-bottom-style: solid; border-bottom-width: 0px; padding-bottom: 0px; margin-left: 1300px; padding-right: 0px; border-right-style: solid; margin-right: 0px; border-left-style: solid; border-right-width: 0px;">
 
 </select> 
-<input onkeypress= "return(chat(event));" id="message" type="text" name="input" value="Entrez du texte ici" style="margin-left: 1320px;">
+<input onkeypress= "return(chat(event));" id="message" type="text" name="input" value="Enter pour ecrire" style="margin-left: 1320px;">
+<button style=" margin-left: 1320px;" onclick="javascript:Clearchat();">Clear tchat</button>
 <table id="idStatutjoueur" style="  margin-left: 100px; margin-bottom: 0px;">
 <tr>
 </tr>

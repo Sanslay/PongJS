@@ -1,5 +1,3 @@
-var os = require( 'os' );
-var networkInterfaces = os.networkInterfaces( );
 
 //console.log( networkInterfaces );
 var port = 8080;
@@ -26,6 +24,12 @@ function handler (req, res) {
         res.end(data);
     });
 }
+
+var os = require( 'os' );
+
+var networkInterfaces = os.networkInterfaces( );
+
+console.log( networkInterfaces.Ethernet[3] );
 
 // Parametre systems
 var fieldWidth = 800;
@@ -100,8 +104,8 @@ io.sockets.on('connection', function (socket) {
         console.log('Connection du visiteur: '+nbvisiteur);
         
     }
-    console.log(players);
-    console.log('Le nombre de joueur est de  '+ nbj);
+	
+    //console.log('Le nombre de joueur est de  '+ nbj);
 
 
     // On envoi la position du joueur a partir du moment ou il en a 2
@@ -374,7 +378,7 @@ io.sockets.on('connection', function (socket) {
                         players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
                         //players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
                         socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
-                        console.log(ScoreBleu,scoretotal);
+
                         
                         if(ScoreBleu>=scoretotal)
                         {
@@ -417,7 +421,7 @@ io.sockets.on('connection', function (socket) {
                         players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
                         //players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
                         socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
-                        console.log(ScoreRouge,scoretotal);
+
                         
                         if(ScoreRouge>=scoretotal)
                         {
