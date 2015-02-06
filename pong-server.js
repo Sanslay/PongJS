@@ -29,8 +29,6 @@ var os = require( 'os' );
 
 var networkInterfaces = os.networkInterfaces( );
 
-console.log( networkInterfaces.Ethernet[3] );
-
 // Parametre systems
 var fieldWidth = 800;
 var fieldHeight = 500;
@@ -88,7 +86,14 @@ io.sockets.on('connection', function (socket) {
     
     //On envoi au client son numero
     socket.emit('player-number', player.number);
-        
+		if(player.number==0)
+		{
+		socket.broadcast.emit('chat_reponse',"Le joueur bleu vient d'arriver"); 
+		}
+		if(player.number==1)
+		{
+		socket.broadcast.emit('chat_reponse',"Le joueur rouge vient d'arriver"); 
+		}
     }
     //si il y a deja 2 joueurs on defini les nouveaux joueur comme 3 ou encore spectateur
     else
@@ -139,9 +144,10 @@ io.sockets.on('connection', function (socket) {
                         //on attend que on est sur que l'on a 2 joueurs
                         if(nbj==2)
                         {
-                            //On renvoi les data au joueur adverse
+							
+							 //On renvoi les data au joueur adverse
                             players[1].socket.emit('game_pret',data);
-                            //On stock la boucle
+					          //On stock la boucle
                             clearInterval(BouclePret);
                         }
                         //toutes les 20ms
@@ -254,6 +260,7 @@ io.sockets.on('connection', function (socket) {
                 }
                 if(spectateurs.number==3)
                 {
+					socket.broadcast.emit('chat_reponse',"Un visiteur vient de partir");
                     console.log('Deconnection d un visiteur ');
                     nbvisiteur--;
                 }
@@ -358,6 +365,7 @@ io.sockets.on('connection', function (socket) {
 
     //La position de la balle au depart en direction
     var ballVector = [2,2];
+	var coef=1;
     ball = {'x': fieldWidth / 2, 'y': fieldHeight / 2};
     //Toute les interval de 5 msS on fait Boucle
     var Boucle = setInterval(function() {
@@ -369,8 +377,11 @@ io.sockets.on('connection', function (socket) {
 
                 if(ball.x < (playerWidth + ballRadius)) 
                 {       
+				coef=coef+0.05;
                     if(players[0].position >= ball.y || (players[0].position + playerHeight) <= ball.y) 
                     {
+							//on réinitialise le coef d'augmentation de difficulté
+					   coef=1;
                         //Le joueur 1 a perdu la partie
                         
                         ScoreBleu++;
@@ -412,9 +423,13 @@ io.sockets.on('connection', function (socket) {
                 
                 if(ball.x > (fieldWidth - playerWidth - ballRadius)) 
                 {
+					coef=coef+0.05;
                     // player 2 side
                     if(players[1].position >= ball.y || (players[1].position + playerHeight) <= ball.y) 
                     {
+							//on réinitialise le coef d'augmentation de difficulté
+							//on réinitialise le coef d'augmentation de difficulté
+							coef=1;
                         // player 2 lost
                         ScoreRouge++;
                         //On envoi les nouveaux score
@@ -469,8 +484,8 @@ io.sockets.on('connection', function (socket) {
                 //console.log('player.number: ' + player.number + ', ball.x: ' + ball.x + ', ball.y: ' + ball.y + ', ballVector: ' + ballVector);
                 
             
-                ball.x += ballVector[0]*Vitesse;
-                ball.y += ballVector[1]*Vitesse;
+                ball.x += ballVector[0]*Vitesse*coef;
+                ball.y += ballVector[1]*Vitesse*coef;
                 //On envoi la position au client0 point d'origine du jeu
                 players[0].socket.emit('ball-position', { 'x': ball.x, 'y': ball.y});
                 //envoi de la position de la ball a tous

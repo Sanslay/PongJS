@@ -391,7 +391,7 @@ function chat(event)
 		var LeMessage = document.getElementById('message');
 
 		data=[player,LeMessage.value]
-
+		LeMessage.value="";
 		socket.emit('game_chat', data);
 
 	

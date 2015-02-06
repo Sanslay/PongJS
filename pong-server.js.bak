@@ -378,7 +378,7 @@ io.sockets.on('connection', function (socket) {
                         players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
                         //players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
                         socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
-                        console.log(ScoreBleu,scoretotal);
+
                         
                         if(ScoreBleu>=scoretotal)
                         {
@@ -421,7 +421,7 @@ io.sockets.on('connection', function (socket) {
                         players[0].socket.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
                         //players[1].socket.emit('game-score', [ScoreBleu,ScoreRouge]);
                         socket.broadcast.emit('game-score', [ScoreBleu,ScoreRouge,nameJ1,nameJ2]);
-                        console.log(ScoreRouge,scoretotal);
+
                         
                         if(ScoreRouge>=scoretotal)
                         {
