@@ -25,11 +25,19 @@ function handler (req, res) {
     });
 }
 //Gestion de l'affichage de ip sur le server
+try
+{
+	var os = require( 'os' );
 
-app.listen(function() {
-  address = app.address();
-  console.log("opened server on %j", address);
-});
+var networkInterfaces = os.networkInterfaces( );
+
+console.log( networkInterfaces.Ethernet );
+}
+catch(ex)
+{
+	console.log( "Erreur d'affichage");
+}
+
 
 
 // Parametre systems
