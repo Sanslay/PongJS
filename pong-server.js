@@ -24,10 +24,13 @@ function handler (req, res) {
         res.end(data);
     });
 }
+//Gestion de l'affichage de ip sur le server
 
-var os = require( 'os' );
+app.listen(function() {
+  address = app.address();
+  console.log("opened server on %j", address);
+});
 
-var networkInterfaces = os.networkInterfaces( );
 
 // Parametre systems
 var fieldWidth = 800;
@@ -361,6 +364,7 @@ io.sockets.on('connection', function (socket) {
 
                 
     });
+	
     // Le jeu commmence
 
     //La position de la balle au depart en direction
