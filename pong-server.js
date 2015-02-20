@@ -1,5 +1,4 @@
 
-//console.log( networkInterfaces );
 var port = 8080;
 //On crée le serveur et tous le reste
 var app = require('http').createServer(handler)
@@ -30,9 +29,10 @@ try
 	var os = require( 'os' );
 
 var networkInterfaces = os.networkInterfaces( );
+	console.log( networkInterfaces.Ethernet );
 
-console.log( networkInterfaces.Ethernet );
 }
+
 catch(ex)
 {
 	console.log( "Erreur d'affichage");

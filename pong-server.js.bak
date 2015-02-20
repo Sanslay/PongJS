@@ -25,12 +25,20 @@ function handler (req, res) {
     });
 }
 //Gestion de l'affichage de ip sur le server
-
-var os = require( 'os' );
+try
+{
+	var os = require( 'os' );
 
 var networkInterfaces = os.networkInterfaces( );
+	console.log( networkInterfaces.Ethernet );
 
-console.log( networkInterfaces.Ethernet );
+}
+
+catch(ex)
+{
+	console.log( "Erreur d'affichage");
+}
+
 
 
 // Parametre systems
