@@ -1,4 +1,3 @@
-
 var port = 8080;
 //On crée le serveur et tous le reste
 var app = require('http').createServer(handler)
@@ -24,18 +23,21 @@ function handler (req, res) {
     });
 }
 //Gestion de l'affichage de ip sur le server
+
+
 try
 {
 	var os = require( 'os' );
 
 var networkInterfaces = os.networkInterfaces( );
-	console.log( networkInterfaces.Ethernet );
-
+	var colors = require('colors');
+	console.log( networkInterfaces);
+	console.log('LA LISTE DE VOS RESEAUX N EST PAS TOUJOURS UTILISER'.red);
 }
 
 catch(ex)
 {
-	console.log( "Erreur d'affichage");
+	console.log( "Erreur d'affichage des adresses");
 }
 
 

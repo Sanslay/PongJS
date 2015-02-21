@@ -12,14 +12,16 @@ PongJS
 <script type="text/javascript">
 
  
-/*********************GESTION ADRESSE A CHANGER*******************/
+/*********************GESTION ADRESSE*******************/
 
 //ADRESSE DU SERVER FIXE A CHANGER
 // Configuration de la page web
 //var serverAddr = 'http://pongjs.dynamic-dns.net:8080/';
-var serverAddr = '192.168.43.13:8080/';
+var serverAddr = '192.168.1.65:8080/';
 
-/*********************FIN DE GESTION ADRESSE A CHANGER*******************/
+/*********************FIN DE GESTION ADRESSE*******************/
+
+/*************************CONFIGURATION RAPHAEL**************************/
 // Configuration du paper Raphael: TAILLE
 var pWidth = 800;
 var pHeight = 500;
@@ -33,13 +35,7 @@ var p2Color = "#cf2323";
 // Configuration des circle Raphael: COULEUR
 var ballColor = "#37cf23";
 var ballRadius = 20;
-//Nombre de joueur initialise
-var player = 0;
-//***********CREATION FORMULAIRE
-var valid=false;
 
-//*******ON VALIDE******//
-/**************On crée les images sur le paper Raphael **************/
 
 // Cree le paper
 var paper = Raphael(500, 0, pWidth, pHeight);
@@ -57,217 +53,213 @@ ball.attr("fill", ballColor);
 
 //On crée le paper du score
 var paperText= Raphael(85, 350, pWidth1, pHeight1);
-//Bordure
-// var rec = paper1.rect(0, 0, pWidth1, pHeight1, 5);
-//texte
-var texte=paperText.text(140,10,"");
-texte.attr('font-size',16);
-//On part du principe que l'on a 2 joueur
+
+/*************************FIN CONFIGURATION RAPHAEL**************************/
+/*********************INITIALISATION VARIABLE JOUEUR***************************/
+//Nombre de joueur initialise
+var player = 0;
+
 var players = [p1, p2];
+/*********************FIN INITIALISATION VARIABLE JOUEUR***************************/
 
 
-
-/*******************************/
 /******************CONNECTION AU SERVEUR ********************/
 // On cree une connection avec le socket à l'adresse
 var socket = io.connect(serverAddr);
 
 //Ecoute de message de type connect lorsque on est connecter au server
-socket.on('connect', function(){
-
-//On attend le nombre de joueur
-socket.on('player-number', function(data) {
-	//On recupere le nombre de joueur
-	player = data;
-
-	console.log("Vous etes le joueur"+ player);
-
-	var cell, ligne;
-
-	//On crée le html d'info joueur
-	var tableau = document.getElementById("idStatutjoueur");
-	var nbLignes = tableau.rows.length;
-	tableau.deleteRow(-1)
-	ligne = tableau.insertRow(-1); 
-	cell = ligne.insertCell(0);
-
-
-	if(player==0)
-	{
-		cell.innerHTML = "Vous etes le  joueur bleu" ;
-		FonctionMenu(tableau);
-
-	}
-	if(player==1)
-	{
-		cell.innerHTML = "Vous etes le joueur rouge" ;
-		FonctionMenu(tableau);
-	}
-
-	if(player==3)
-	{
-	cell.innerHTML = "Vous etes un visiteur le jeu et deja en cours" ;
-
-	}
-});
-
-
-//On envoi un message lorsque l'on perd le server
-socket.on('disconnect', function(data)
+socket.on('connect', function()
 {
-	alert("SERVER STOP ");
-});
 
-//On envoi un message dans le tchat lorsque le joueur est pret.
-socket.on('game_pret', function(data)
-{
-	var ZoneChat = document.getElementById('chat');
-	var LeMessage = document.getElementById('message');
-
-	ZoneChat.add(new Option("Log SERVER:"));
-	ZoneChat.add(new Option("Le joueur "+data[1]+" est pret"));
-	ZoneChat.add(new Option("Il a choisi une vitesse de "+data[2]));
-	ZoneChat.add(new Option("Pour atteindre le score de "+data[3]));
-});
-
-//On attend les positions joueur adverse
-socket.on('opponents-position', function(data) 
-{
-	players[(player + 1) % 2].attr("y", data);
-});
-
-//Gestion des positions raquette client
-socket.on('position-raquette', function(data) 
-{
-	//Pour le joueur spectateur il recoit la position de chaque raquette 
-	if(player==3)
+	//On attend le numero du joueur defini par le serveur
+	socket.on('player-number', function(data) 
 	{
-	players[0].attr("y", data[0]);
-	players[1].attr("y", data[1]);
-	}
-});
+		//On recupere le nombre de joueur
+		player = data;
 
-//On attend les positions de la ball
-socket.on('ball-position', function (data) {
-
-// ils seront ecrit directement dans les ball
-ball.attr("cx", data.x);
-ball.attr("cy", data.y);
-});
-
-//Affichage du score.
-socket.on('game-score', function (data) {
-
-	var cell, ligne;
-
-	//On crée le html d'info joueur
-	var tableau = document.getElementById("idBox");
-	var nbLignes = tableau.rows.length;
-	if(nbLignes>0)
-	{
+		console.log("Vous etes le joueur"+ player);
+		//On crée le html en JS
+		var cell, ligne;
+		var tableau = document.getElementById("idStatutjoueur");
+		var nbLignes = tableau.rows.length;
 		tableau.deleteRow(-1)
-	}
+		ligne = tableau.insertRow(-1); 
+		cell = ligne.insertCell(0);
 
-	ligne = tableau.insertRow(-1); 
-	cell = ligne.insertCell(0);
-	
-
-	cell.innerHTML = data[2]+" "+data[1]+" - "+data[0]+" "+data[3];
-});
-
-//On attend que un joueur ce deconnecte
-socket.on('opponent-disconnected', function(data) 
-{
-	alert("Deconnection du joueur "+data);
-	location.reload()
-});
-
-//On attend que la ball touche une raquette ou un mur
-socket.on('squish', function() 
-{
-	//On crée l'animation sur la ball
-	var anim = Raphael.animation({r: ballRadius}, 500, "bounce");
-
-	ball.attr('r', ballRadius - 5);
-	ball.animate(anim);
-});
-//Affichage des messages tchat
-socket.on('chat_reponse', function(data) 
-{
-	var ZoneChat = document.getElementById('chat');
-	var LeMessage = document.getElementById('message');
-	ZoneChat.add(new Option(data));
-});
-
-socket.on('game_etat', function(data) 
-{
-	var cell, ligne;
-
-	//On crée le html d'info joueur
-	var tableau = document.getElementById("idBoxvitesse");
-	var nbLignes = tableau.rows.length;
-	if(nbLignes>0)
-	{
-		tableau.deleteRow(-1)
-	}
-
-	//var  newdata=[nameJ1,nameJ2,Vitesse,scoretotal]
-	ligne = tableau.insertRow(-1); 
-	cell = ligne.insertCell(0);
-	cell.innerHTML = data[0]+" vs "+data[1];
-	ligne = tableau.insertRow(-1);
-	cell = ligne.insertCell(0);
-	cell.innerHTML = "La vitesse est de "+parseInt(data[2])*100+"%";
-	ligne = tableau.insertRow(-1);
-	cell = ligne.insertCell(0);
-	cell.innerHTML = "Le score total est de  "+data[3];
-	});
-
-socket.on('game-victoire', function(data) 
-	{
-	console.log("victoire de: "+ data);
-	alert("victoire de: "+ data);
-	var tableau = document.getElementById("idStatutjoueur");
-	if(player!=3)
-	{
-		FonctionMenu(tableau);
-	}
-
-	tableau = document.getElementById("idBoxvitesse");
-	
-	var nbLignes = tableau.rows.length;
-	var i =0;
-	while(i!=nbLignes)
+		if(player==0)
 		{
-		tableau.deleteRow(-1)
-		i++;
+			cell.innerHTML = "Vous etes le  joueur bleu" ;
+			FonctionMenu(tableau);
+
+		}
+		if(player==1)
+		{
+			cell.innerHTML = "Vous etes le joueur rouge" ;
+			FonctionMenu(tableau);
 		}
 
+		if(player==3)
+		{
+		cell.innerHTML = "Vous etes un visiteur le jeu et deja en cours" ;
+
+		}
+	});
+
+
+	//Lors de la perte du serveur un message est envoyé au client
+	socket.on('disconnect', function(data)
+	{
+		alert("SERVER STOP ");
+	});
+
+	//On envoi un message dans le tchat lorsque le joueur est pret.
+	socket.on('game_pret', function(data)
+	{
+		var ZoneChat = document.getElementById('chat');
+		var LeMessage = document.getElementById('message');
+		ZoneChat.add(new Option("Log SERVER:"));
+		ZoneChat.add(new Option("Le joueur "+data[1]+" est pret"));
+		ZoneChat.add(new Option("Il a choisi une vitesse de "+data[2]));
+		ZoneChat.add(new Option("Pour atteindre le score de "+data[3]));
+	});
+
+	//On attend les positions joueur adverse
+	socket.on('opponents-position', function(data) 
+	{
+		players[(player + 1) % 2].attr("y", data);
+	});
+
+	//Gestion des positions raquette pour le client visiteur pour les autres joueurs on utilise "opponents-position"
+	socket.on('position-raquette', function(data) 
+	{
+		//Pour le joueur visiteur il recoit la position de chaque raquette 
+		if(player==3)
+		{
+		players[0].attr("y", data[0]);
+		players[1].attr("y", data[1]);
+		}
+	});
+
+	//On recoit les positions de la balle
+	socket.on('ball-position', function (data) {
+
+	// ils seront ecrit directement dans les ball
+	ball.attr("cx", data.x);
+	ball.attr("cy", data.y);
+	});
+
+	//Affichage du score
+	socket.on('game-score', function (data) {
+		//On crée le html
+		var cell, ligne;
+		var tableau = document.getElementById("idBox");
+		var nbLignes = tableau.rows.length;
+		if(nbLignes>0)
+		{
+			tableau.deleteRow(-1)
+		}
+
+		ligne = tableau.insertRow(-1); 
+		cell = ligne.insertCell(0);
+		
+		cell.innerHTML = data[2]+" "+data[1]+" - "+data[0]+" "+data[3];
+	});
+
+	//Un alert quand un joueur quitte le jeu, cela ne concerne pas les visiteurs
+	socket.on('opponent-disconnected', function(data) 
+	{
+		alert("Deconnection du joueur "+data);
+		//On recharge la page
+		location.reload()
+	});
+
+	//Lorsque le serveur calcule que la balle à touché un mur on fait une animation
+	socket.on('squish', function() 
+	{
+		//On crée l'animation sur la ball
+		var anim = Raphael.animation({r: ballRadius}, 500, "bounce");
+
+		ball.attr('r', ballRadius - 5);
+		ball.animate(anim);
+	});
+	
+	//Affichage des messages tchat
+	socket.on('chat_reponse', function(data) 
+	{
+		var ZoneChat = document.getElementById('chat');
+		var LeMessage = document.getElementById('message');
+		ZoneChat.add(new Option(data));
+	});
+	//Affichage des données du jeu pour chacun des joueurs
+	socket.on('game_etat', function(data) 
+	{
+		var cell, ligne;
+
+		//On crée le html d'info joueur
+		var tableau = document.getElementById("idBoxvitesse");
+		var nbLignes = tableau.rows.length;
+		if(nbLignes>0)
+		{
+			tableau.deleteRow(-1)
+		}
+		ligne = tableau.insertRow(-1); 
+		cell = ligne.insertCell(0);
+		cell.innerHTML = data[0]+" vs "+data[1];
+		ligne = tableau.insertRow(-1);
+		cell = ligne.insertCell(0);
+		cell.innerHTML = "La vitesse est de "+parseInt(data[2])*100+"%";
+		ligne = tableau.insertRow(-1);
+		cell = ligne.insertCell(0);
+		cell.innerHTML = "Le score total est de  "+data[3];
+	});
+	//Gestion de la victoire
+	socket.on('game-victoire', function(data) 
+	{
+		console.log("victoire de: "+ data);
+		alert("victoire de: "+ data);
+		var tableau = document.getElementById("idStatutjoueur");
+		if(player!=3)
+		{
+			FonctionMenu(tableau);
+		}
+
+		tableau = document.getElementById("idBoxvitesse");
+		
+		var nbLignes = tableau.rows.length;
+		var i =0;
+		while(i!=nbLignes)
+			{
+			tableau.deleteRow(-1)
+			i++;
+			}
+
 
 	});
 });
 
-// Mouvement de souris
-(function() {
-window.onmousemove = handleMouseMove;
-function handleMouseMove(event)
-{
-//Le joueur 3 (spectateur) ne pouvant pas jouers
-if(player!=3)
-{
-event = event || window.event;
-//On change que les valeurs de Y au numero defini par data
-var y = event.clientY;
-var x = event.clientX;
+// Gestion des mouvements de souris
+(function() 
+	{
+	window.onmousemove = handleMouseMove;
+	function handleMouseMove(event)
+	{
+		//Le joueur 3 (spectateur) ne pouvant pas jouer
+		if(player!=3)
+		{
+			event = event || window.event;
+			//On change que les valeurs de Y au numero defini par data
+			var y = event.clientY;
+			var x = event.clientX;
 
-if(y>=(pHeight-100)){
-y=pHeight-110;}
-//console.log(y);
-//console.log(x);
-players[player].attr("y", y+3);
-socket.emit('player-position', y+3);
-}
-}
+			if(y>=(pHeight-100))
+			{
+				y=pHeight-110;
+			}
+
+			players[player].attr("y", y+3);
+			socket.emit('player-position', y+3);
+		}
+	}
 })();
 
 function combo(thelist)
@@ -279,35 +271,31 @@ function combo(thelist)
 }
 function FonctionMenu(tableau)
 {
+	//creation html du formulaire de debut
 	ligne = tableau.insertRow(-1);
 	cell = ligne.insertCell(0);
-
 	cell.innerHTML = "Name" ;
-
-	//creationinput
 	ligne = tableau.insertRow(-1);
 	cell = ligne.insertCell(0);
 	var input = document.createElement("input" ) ;
-			input.type = "text" ;
-			input.value = "Maxime" ;
-			input.id = "idname" ;
-			input.style=	"width:180px;";
-
-
-			cell.appendChild(input) ;
+		input.type = "text" ;
+		input.value = "Maxime" ;
+		input.id = "idname" ;
+		input.style=	"width:180px;";
+		cell.appendChild(input) ;
 			
 	ligne = tableau.insertRow(-1);
-	cell = ligne.insertCell(0);
-	
-	cell.innerHTML = "Difficulte" ;	
+		cell = ligne.insertCell(0);
+		cell.innerHTML = "Difficulte" ;	
 		
-		ligne = tableau.insertRow(-1);
+	ligne = tableau.insertRow(-1);
 	cell = ligne.insertCell(0);
 	var combo = document.createElement("select" ) ;
-			combo.type = "text" ;
-			combo.id = "thelists" ;
-			combo.setAttribute("onChange","combo(this)") ;
-			cell.appendChild(combo) ;
+		combo.type = "text" ;
+		combo.id = "thelists" ;
+		combo.setAttribute("onChange","combo(this)") ;
+		cell.appendChild(combo) ;
+	
 	var myselect = document.getElementById('thelists');
 		myselect.add(new Option("Tres Facile", "0"));
 		myselect.add(new Option("Facile", "0"));
@@ -338,13 +326,10 @@ function FonctionMenu(tableau)
 		myselect.add(new Option(i, "0"));
 		i++;
 	}
-
 			
 	ligne = tableau.insertRow(-1);
 	cell = ligne.insertCell(0);
 
-
-	//creationbouton
 	var button = document.createElement("input" ) ;
 			button.type = "button" ;
 			button.value = "Pret?" ;
@@ -353,8 +338,6 @@ function FonctionMenu(tableau)
 			button.setAttribute("onClick","javascript:Pret();") ;
 
 			cell.appendChild(button) ;	
-
-
 }
 function Pret()
 {
@@ -362,8 +345,6 @@ function Pret()
 	var vitesse = thelists.selectedIndex;
 	var score=thelistscore.selectedIndex+1;
 	data=[player,idname.value,vitesse,score]
-
-	//data=player;
 
 	socket.emit('joueur-pret', data);
 
