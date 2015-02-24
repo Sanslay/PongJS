@@ -391,7 +391,7 @@ io.sockets.on('connection', function (socket) {
 
                 if(ball.x < (playerWidth + ballRadius)) 
                 {       
-				coef=coef+0.05;
+				coef=coef+0.01;
                     if(players[0].position >= ball.y || (players[0].position + playerHeight) <= ball.y) 
                     {
 							//on réinitialise le coef d'augmentation de difficulté
@@ -437,7 +437,7 @@ io.sockets.on('connection', function (socket) {
                 
                 if(ball.x > (fieldWidth - playerWidth - ballRadius)) 
                 {
-					coef=coef+0.05;
+					coef=coef+0.01;
                     // player 2 side
                     if(players[1].position >= ball.y || (players[1].position + playerHeight) <= ball.y) 
                     {

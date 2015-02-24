@@ -1,9 +1,7 @@
 <html>
 <head>
 <script src="/socket.io/socket.io.js"></script>
-
 <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-<script src="raphael.js"></script>
 </head>
 <title>
 PongJS
@@ -17,7 +15,7 @@ PongJS
 //ADRESSE DU SERVER FIXE A CHANGER
 // Configuration de la page web
 //var serverAddr = 'http://pongjs.dynamic-dns.net:8080/';
-var serverAddr = '192.168.1.65:8080/';
+var serverAddr = '192.168.1.1:8080/';
 
 /*********************FIN DE GESTION ADRESSE*******************/
 
@@ -35,7 +33,6 @@ var p2Color = "#cf2323";
 // Configuration des circle Raphael: COULEUR
 var ballColor = "#37cf23";
 var ballRadius = 20;
-
 
 // Cree le paper
 var paper = Raphael(500, 0, pWidth, pHeight);
@@ -55,6 +52,7 @@ ball.attr("fill", ballColor);
 var paperText= Raphael(85, 350, pWidth1, pHeight1);
 
 /*************************FIN CONFIGURATION RAPHAEL**************************/
+
 /*********************INITIALISATION VARIABLE JOUEUR***************************/
 //Nombre de joueur initialise
 var player = 0;

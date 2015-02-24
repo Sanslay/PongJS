@@ -37,7 +37,7 @@ var networkInterfaces = os.networkInterfaces( );
 
 catch(ex)
 {
-	console.log( "Erreur d'affichage");
+	console.log( "Erreur d'affichage des adresses");
 }
 
 
@@ -391,7 +391,7 @@ io.sockets.on('connection', function (socket) {
 
                 if(ball.x < (playerWidth + ballRadius)) 
                 {       
-				coef=coef+0.05;
+				coef=coef+0.01;
                     if(players[0].position >= ball.y || (players[0].position + playerHeight) <= ball.y) 
                     {
 							//on réinitialise le coef d'augmentation de difficulté
