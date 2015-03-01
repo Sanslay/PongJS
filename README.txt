@@ -3,9 +3,9 @@ Julien T.
 EI5 IAIE
 Projet PONG-JS
 JAVASCRIPT NODE JS SOCKET IO RAPHAEL
+Le jeu Pong en reseau avec node Js
 
 /********MODE D'EMPLOI**********/
-
 
 Etape1:
 Récupéré l'adresse IP de l'ordinateur qui héberge le serveur. 
